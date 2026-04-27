@@ -87,3 +87,10 @@ http://localhost:8000
 - 移除了首頁大型深色 hero 區塊。
 - 色彩改成淺灰背景、白色卡片、藍色主按鈕。
 - 根據 `服装.docx` 新增婚紗、女僕裝、OL、競泳、修女服、兔女郎、和服等服飾 Prompt Tag。
+
+## 2026-04-27 v3 更新
+
+- 移除頂部的「GitHub 說明」與「複製組合 Prompt」按鈕。
+- 調整「匯出資料」與「匯入 JSON」按鈕，使兩者高度與位置對齊。
+- 每個 tag 卡片新增「修改」按鈕，可修改標題、分類、模型、穩定度、Prompt tags、Negative / UC tags 與備註。
+- 修改後會先存在瀏覽器 localStorage；如需帶到 GitHub，請按「匯出資料」下載 JSON，再覆蓋 `data/tags.json`。

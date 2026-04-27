@@ -22,8 +22,6 @@
           <button class="ghost" id="exportBtn" type="button">匯出資料</button>
           <label class="ghost file-label" for="importFile">匯入 JSON</label>
           <input id="importFile" type="file" accept="application/json" hidden />
-          <a class="ghost" href="README.md" target="_blank" rel="noreferrer">GitHub 說明</a>
-          <button id="copyPromptBtn" type="button">複製組合 Prompt</button>
         </div>
       </nav>
 
@@ -105,6 +103,58 @@
       </section>
     </section>
   </main>
+
+
+  <div id="editDialog" class="modal" hidden>
+    <div class="modal-backdrop" data-close-edit></div>
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="editDialogTitle">
+      <div class="modal-head">
+        <div>
+          <h2 id="editDialogTitle">修改 Tag 內容</h2>
+          <p>修改後會儲存在本機瀏覽器。需要帶到 GitHub 時，請按「匯出資料」下載 JSON。</p>
+        </div>
+        <button class="icon-btn" id="closeEditBtn" type="button" aria-label="關閉修改視窗">×</button>
+      </div>
+
+      <form id="editForm" class="edit-form">
+        <input name="id" type="hidden" />
+        <div class="form-grid">
+          <label>
+            標題
+            <input name="title" required />
+          </label>
+          <label>
+            分類
+            <input name="category" required />
+          </label>
+          <label>
+            模型
+            <input name="model" placeholder="例如：NAI4.5 / 通用 / 自訂" />
+          </label>
+          <label>
+            穩定度
+            <input name="stability" placeholder="例如：高 / 中 / 低 / 自訂" />
+          </label>
+        </div>
+        <label>
+          Prompt Tags
+          <textarea name="tags" rows="6" required></textarea>
+        </label>
+        <label>
+          Negative / UC Tags
+          <textarea name="negative" rows="4"></textarea>
+        </label>
+        <label>
+          備註
+          <textarea name="note" rows="3"></textarea>
+        </label>
+        <div class="modal-actions">
+          <button class="secondary" id="cancelEditBtn" type="button">取消</button>
+          <button type="submit">儲存修改</button>
+        </div>
+      </form>
+    </section>
+  </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
