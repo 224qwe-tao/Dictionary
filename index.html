@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NovelAI Prompt Tag 字典</title>
+  <meta name="description" content="NovelAI Prompt Tag 字典：搜尋、收藏、組合、複製 Prompt tag。適合部署到 GitHub Pages。" />
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <nav class="topbar" aria-label="主導覽">
+      <div class="brand">
+        <span class="brand-mark">N</span>
+        <div>
+          <strong>NovelAI Prompt Tag 字典</strong>
+          <small>Search · Build · Copy</small>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="ghost" id="exportBtn" type="button">匯出資料</button>
+        <label class="ghost file-label" for="importFile">匯入 JSON</label>
+        <input id="importFile" type="file" accept="application/json" hidden />
+        <a class="ghost" href="README.md" target="_blank" rel="noreferrer">GitHub 說明</a>
+      </div>
+    </nav>
+
+    <section class="hero-content">
+      <div>
+        <p class="eyebrow">GitHub Pages Ready</p>
+        <h1>把常用 tag 變成可搜尋、可收藏、可組合的 Prompt 字典。</h1>
+        <p class="hero-copy">
+          依照上傳文件的分類思路整理：畫風、角色、人設、構圖、場景、服飾、表情、品質修正與 Prompt 模板。
+          公開版已過濾不適合收錄的敏感內容。
+        </p>
+      </div>
+      <aside class="hero-card" aria-label="快速統計">
+        <span id="totalCount">0</span>
+        <p>已載入 tag 條目</p>
+        <button id="copyPromptBtn" type="button">複製組合 Prompt</button>
+      </aside>
+    </section>
+  </header>
+
+  <main>
+    <section class="notice" id="safeNotice">
+      <strong>公開資料安全模式：</strong>
+      本網站模板只內建安全的 starter tags。原文件中涉及未成年、強迫、暴力、獸交、重口等內容不會放入公開資料集。
+      你可以在本地自行新增合法、合規的自用 tag。
+      <button id="dismissNotice" aria-label="關閉提示">×</button>
+    </section>
+
+    <section class="layout">
+      <aside class="sidebar">
+        <div class="panel search-panel">
+          <label for="searchInput">搜尋 tag / 中文標題</label>
+          <input id="searchInput" type="search" placeholder="例如：畫師、貓娘、教室、pov、maid..." />
+        </div>
+
+        <div class="panel">
+          <h2>分類</h2>
+          <div id="categoryList" class="category-list"></div>
+        </div>
+
+        <div class="panel">
+          <h2>Prompt Builder</h2>
+          <p class="hint">點擊卡片的「加入」會放到這裡。</p>
+          <textarea id="promptBox" placeholder="Prompt 會出現在這裡..." rows="8"></textarea>
+          <textarea id="negativeBox" placeholder="Negative / UC 會出現在這裡..." rows="5"></textarea>
+          <div class="button-row">
+            <button id="copyPromptBtn2" type="button">複製 Prompt</button>
+            <button class="secondary" id="clearPromptBtn" type="button">清空</button>
+          </div>
+          <div class="weight-tools" aria-label="權重工具">
+            <button data-wrap="{}" type="button">{加強}</button>
+            <button data-wrap="{{}}" type="button">{{強加強}}</button>
+            <button data-wrap="[]" type="button">[降低]</button>
+            <button data-wrap="1.2" type="button">1.2::tag::</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>新增自訂 Tag</h2>
+          <form id="customForm" class="custom-form">
+            <input name="title" placeholder="標題，例如：黑色和服" required />
+            <input name="category" placeholder="分類，例如：服飾 / 道具" required />
+            <textarea name="tags" placeholder="tag1,tag2,tag3" required rows="4"></textarea>
+            <textarea name="negative" placeholder="negative tags，可留空" rows="3"></textarea>
+            <input name="note" placeholder="備註，可留空" />
+            <button type="submit">加入本地資料</button>
+          </form>
+        </div>
+      </aside>
+
+      <section class="content">
+        <div class="toolbar">
+          <div>
+            <h2 id="resultTitle">全部 Tags</h2>
+            <p id="resultMeta">正在載入...</p>
+          </div>
+          <select id="sortSelect" aria-label="排序">
+            <option value="category">按分類</option>
+            <option value="title">按標題</option>
+            <option value="model">按模型</option>
+            <option value="stability">按穩定度</option>
+          </select>
+        </div>
+        <div id="cards" class="cards" aria-live="polite"></div>
+        <div id="emptyState" class="empty-state" hidden>
+          <h3>找不到結果</h3>
+          <p>試試搜尋英文 tag、中文分類，或新增自訂條目。</p>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
