@@ -1,5 +1,6 @@
 const STORAGE_KEYS = {
   customTags: "naiTagDictionary.customTags",
+  edits: "naiTagDictionary.edits",
   favorites: "naiTagDictionary.favorites",
   prompt: "naiTagDictionary.prompt",
   negative: "naiTagDictionary.negative",
@@ -50,11 +51,11 @@ async function loadTags() {
   try {
     const response = await fetch("data/tags.json", { cache: "no-store" });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const baseTags = await response.json();
-    return [...baseTags, ...getCustomTags()].map(normalizeTag);
+    const baseTags = (await response.json()).map(normalizeTag);
+    return applyStoredEdits(mergeTags(baseTags, getCustomTags().map(normalizeTag)));
   } catch (error) {
     console.warn("使用 fallbackTags，原因：", error);
-    return [...fallbackTags, ...getCustomTags()].map(normalizeTag);
+    return applyStoredEdits(mergeTags(fallbackTags.map(normalizeTag), getCustomTags().map(normalizeTag)));
   }
 }
 
@@ -71,6 +72,35 @@ function normalizeTag(tag, index = 0) {
     source: tag.source || "custom",
     safe: tag.safe !== false
   };
+}
+
+function mergeTags(baseTags, customTags) {
+  const map = new Map();
+  [...baseTags, ...customTags].forEach((tag, index) => {
+    map.set(tag.id, normalizeTag(tag, index));
+  });
+  return [...map.values()];
+}
+
+function getEdits() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEYS.edits) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function setEdits(edits) {
+  localStorage.setItem(STORAGE_KEYS.edits, JSON.stringify(edits));
+}
+
+function applyStoredEdits(items) {
+  const edits = getEdits();
+  return items.map((tag, index) => normalizeTag({ ...tag, ...(edits[tag.id] || {}) }, index));
+}
+
+function isStoredAsCustom(id) {
+  return getCustomTags().some((tag) => tag.id === id);
 }
 
 function bindEvents() {
@@ -99,7 +129,12 @@ function bindEvents() {
   $("#customForm").addEventListener("submit", handleCustomSubmit);
   $("#exportBtn").addEventListener("click", exportTags);
   $("#importFile").addEventListener("change", importTags);
+  $("#editForm").addEventListener("submit", handleEditSubmit);
+  $("#closeEditBtn").addEventListener("click", closeEditDialog);
+  $("#cancelEditBtn").addEventListener("click", closeEditDialog);
+  document.querySelectorAll("[data-close-edit]").forEach((item) => item.addEventListener("click", closeEditDialog));
 }
+
 
 function render() {
   totalCountEl.textContent = tags.length;
@@ -162,6 +197,7 @@ function renderCards() {
       const action = button.dataset.action;
       if (action === "add") addToBuilder(tag);
       if (action === "copy") copyText(tag.tags, "已複製 tags");
+      if (action === "edit") openEditDialog(tag);
       if (action === "fav") toggleFavorite(tag.id);
     });
   });
@@ -188,10 +224,78 @@ function renderCard(tag) {
       <div class="card-actions">
         <button data-action="add" data-id="${escapeHtml(tag.id)}" type="button">加入</button>
         <button class="secondary" data-action="copy" data-id="${escapeHtml(tag.id)}" type="button">複製</button>
+        <button class="secondary" data-action="edit" data-id="${escapeHtml(tag.id)}" type="button">修改</button>
         <button class="fav ${isFav ? "active" : ""}" data-action="fav" data-id="${escapeHtml(tag.id)}" type="button" aria-label="收藏 ${escapeHtml(tag.title)}">★</button>
       </div>
     </article>
   `;
+}
+
+
+function openEditDialog(tag) {
+  const dialog = $("#editDialog");
+  const form = $("#editForm");
+  form.elements.id.value = tag.id;
+  form.elements.title.value = tag.title;
+  form.elements.category.value = tag.category;
+  form.elements.model.value = tag.model;
+  form.elements.stability.value = tag.stability;
+  form.elements.tags.value = tag.tags;
+  form.elements.negative.value = tag.negative;
+  form.elements.note.value = tag.note;
+  dialog.hidden = false;
+  form.elements.title.focus();
+}
+
+function closeEditDialog() {
+  $("#editDialog").hidden = true;
+}
+
+function handleEditSubmit(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const id = form.elements.id.value;
+  const index = tags.findIndex((item) => item.id === id);
+  if (index === -1) {
+    showToast("找不到要修改的 tag");
+    return;
+  }
+
+  const current = tags[index];
+  const edited = normalizeTag({
+    ...current,
+    title: form.elements.title.value.trim(),
+    category: form.elements.category.value.trim(),
+    model: form.elements.model.value.trim() || "通用",
+    stability: form.elements.stability.value.trim() || "-",
+    tags: form.elements.tags.value.trim(),
+    negative: form.elements.negative.value.trim(),
+    note: form.elements.note.value.trim()
+  });
+
+  if (isStoredAsCustom(id) || edited.source === "custom" || edited.source === "imported") {
+    const customTags = getCustomTags().map((item) => item.id === id ? edited : item);
+    if (!customTags.some((item) => item.id === id)) customTags.push(edited);
+    setCustomTags(customTags);
+  } else {
+    const edits = getEdits();
+    edits[id] = {
+      title: edited.title,
+      category: edited.category,
+      model: edited.model,
+      stability: edited.stability,
+      tags: edited.tags,
+      negative: edited.negative,
+      note: edited.note,
+      editedAt: new Date().toISOString()
+    };
+    setEdits(edits);
+  }
+
+  tags[index] = edited;
+  closeEditDialog();
+  render();
+  showToast("已儲存修改");
 }
 
 function addToBuilder(tag) {
@@ -314,9 +418,10 @@ function importTags(event) {
     try {
       const imported = JSON.parse(reader.result);
       if (!Array.isArray(imported)) throw new Error("JSON 必須是陣列");
-      const normalized = imported.map(normalizeTag);
+      const normalized = imported.map((item, index) => normalizeTag({ source: "imported", ...item }, index));
       setCustomTags(normalized);
-      tags = normalized;
+      setEdits({});
+      tags = mergeTags(tags, normalized);
       activeCategory = "全部";
       render();
       showToast("已匯入 JSON");
