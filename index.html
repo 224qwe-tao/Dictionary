@@ -8,53 +8,45 @@
   <link rel="stylesheet" href="assets/styles.css" />
 </head>
 <body>
-  <header class="hero">
-    <nav class="topbar" aria-label="主導覽">
-      <div class="brand">
-        <span class="brand-mark">N</span>
-        <div>
-          <strong>NovelAI Prompt Tag 字典</strong>
-          <small>Search · Build · Copy</small>
+  <header class="app-header">
+    <div class="app-shell">
+      <nav class="topbar" aria-label="主導覽">
+        <div class="brand">
+          <span class="brand-mark">N</span>
+          <div>
+            <strong>NovelAI Prompt Tag 字典</strong>
+            <small>Search · Build · Copy</small>
+          </div>
         </div>
-      </div>
-      <div class="top-actions">
-        <button class="ghost" id="exportBtn" type="button">匯出資料</button>
-        <label class="ghost file-label" for="importFile">匯入 JSON</label>
-        <input id="importFile" type="file" accept="application/json" hidden />
-        <a class="ghost" href="README.md" target="_blank" rel="noreferrer">GitHub 說明</a>
-      </div>
-    </nav>
+        <div class="top-actions">
+          <button class="ghost" id="exportBtn" type="button">匯出資料</button>
+          <label class="ghost file-label" for="importFile">匯入 JSON</label>
+          <input id="importFile" type="file" accept="application/json" hidden />
+          <a class="ghost" href="README.md" target="_blank" rel="noreferrer">GitHub 說明</a>
+          <button id="copyPromptBtn" type="button">複製組合 Prompt</button>
+        </div>
+      </nav>
 
-    <section class="hero-content">
-      <div>
-        <p class="eyebrow">GitHub Pages Ready</p>
-        <h1>把常用 tag 變成可搜尋、可收藏、可組合的 Prompt 字典。</h1>
-        <p class="hero-copy">
-          依照上傳文件的分類思路整理：畫風、角色、人設、構圖、場景、服飾、表情、品質修正與 Prompt 模板。
-          公開版已過濾不適合收錄的敏感內容。
-        </p>
-      </div>
-      <aside class="hero-card" aria-label="快速統計">
-        <span id="totalCount">0</span>
-        <p>已載入 tag 條目</p>
-        <button id="copyPromptBtn" type="button">複製組合 Prompt</button>
-      </aside>
-    </section>
+      <section class="intro-card">
+        <div>
+          <p class="eyebrow">GitHub Pages Ready</p>
+          <h1>Prompt Tag 字典</h1>
+          <p class="intro-copy">搜尋、收藏、組合 NovelAI 常用 tag。已加入服裝 docx 的服飾 Prompt Tag，適合放到 GitHub Pages 使用。</p>
+        </div>
+        <div class="stat-pill" aria-label="快速統計">
+          <strong id="totalCount">0</strong>
+          <span>已載入 tag 條目</span>
+        </div>
+      </section>
+    </div>
   </header>
 
-  <main>
-    <section class="notice" id="safeNotice">
-      <strong>公開資料安全模式：</strong>
-      本網站模板只內建安全的 starter tags。原文件中涉及未成年、強迫、暴力、獸交、重口等內容不會放入公開資料集。
-      你可以在本地自行新增合法、合規的自用 tag。
-      <button id="dismissNotice" aria-label="關閉提示">×</button>
-    </section>
-
+  <main class="app-main">
     <section class="layout">
       <aside class="sidebar">
         <div class="panel search-panel">
           <label for="searchInput">搜尋 tag / 中文標題</label>
-          <input id="searchInput" type="search" placeholder="例如：畫師、貓娘、教室、pov、maid..." />
+          <input id="searchInput" type="search" placeholder="例如：婚紗、女僕、bikini、maid、pov..." />
         </div>
 
         <div class="panel">
