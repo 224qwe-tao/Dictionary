@@ -84,7 +84,8 @@ function bindEvents() {
     renderCards();
   });
 
-  $("#copyPromptBtn").addEventListener("click", copyBuilderPrompt);
+  const copyPromptBtn = $("#copyPromptBtn");
+  if (copyPromptBtn) copyPromptBtn.addEventListener("click", copyBuilderPrompt);
   $("#copyPromptBtn2").addEventListener("click", copyBuilderPrompt);
   $("#clearPromptBtn").addEventListener("click", clearBuilder);
 
@@ -339,11 +340,13 @@ function restoreBuilder() {
 
 function handleNotice() {
   const notice = $("#safeNotice");
+  const dismiss = $("#dismissNotice");
+  if (!notice || !dismiss) return;
   if (localStorage.getItem(STORAGE_KEYS.notice) === "yes") {
     notice.remove();
     return;
   }
-  $("#dismissNotice").addEventListener("click", () => {
+  dismiss.addEventListener("click", () => {
     localStorage.setItem(STORAGE_KEYS.notice, "yes");
     notice.remove();
   });
