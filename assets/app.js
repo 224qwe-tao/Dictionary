@@ -317,7 +317,7 @@ function copyBuilderPrompt() {
   const prompt = promptBox.value.trim();
   const negative = negativeBox.value.trim();
   const text = negative ? `Prompt:\n${prompt}\n\nNegative / UC:\n${negative}` : prompt;
-  copyText(text, "已複製組合 Prompt");
+  copyText(text, "已複製 Prompt");
 }
 
 function copyText(text, message) {
